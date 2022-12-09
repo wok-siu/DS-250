@@ -1,0 +1,221 @@
+---
+title: "Practice Coding Challenge"
+subtitle: "Course DS 250"
+author: "Duane Siu"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+---
+
+## Practice Coding Challenge
+
+### Name: _Your name here_
+
+### Instructions
+
+_In the Final Coding Challenge I will ask you to complete problems about as challenging as what is shown below.  Plus, you will need to fit a machine learning model with data I provide._
+
+_Remember, you will only have 60 minutes to work on the challenge! You will not be able to complete every question perfectly, but you should spend at least a little time on each question._
+
+_Paste your answers and code inside this `.qmd` file._
+
+
+### Practice Challenges
+
+Start by loading these packages and data:
+
+```{python}
+
+import pandas as pd
+import altair as alt
+import numpy as np
+
+dat = pd.read_csv('https://github.com/byuidatascience/data4missing/raw/master/data-raw/mtcars_missing/mtcars_missing.csv')
+
+```
+
+<br>
+
+**Question 1:** Try recreating the chart below using the [mtcars missing](https://github.com/byuidatascience/data4missing/raw/master/data-raw/mtcars_missing/mtcars_missing.csv) data that you've already loaded.
+
+- Note that `hp` has missing values, and you will have to replace them with the mean.
+- Please drop all cars with a missing name.
+
+
+**Question 1 Answer:**
+
+_Show your chart here._
+
+**Question 1 Code:**
+
+```{python}
+mean_hp = np.mean(dat.hp)
+new_dat = dat.fillna(mean_hp)
+
+chart = (alt.Chart(new_dat)
+      .encode(
+        x = alt.X("hp", title = "Horse Power"),
+        y = alt.Y("mpg", title = "Miles per Gallon")
+      )
+      .mark_circle(color='red')
+)
+
+lines = dat.query("hp == [80,160]")
+
+chart1 = (alt.Chart(lines)
+    .mark_rule(color='grey')
+    .encode(
+        x = "hp"
+    )
+)
+
+chart + chart1
+```
+
+<br>
+
+**Question 2:** Try writing code to recreate the following table.
+
+- Have `cyl` on the rows and `carb` on the columns
+- The values inside the table represent the number of cars with that particular `cyl`/`carb` combination.
+- The `pd.crosstab()` function could be helpful, or maybe `pd.pivot_table()`.
+
+
+|   cyl |   1 |   2 |   3 |   4 |   6 |   8 |
+|------:|----:|----:|----:|----:|----:|----:|
+|     4 |   5 |   6 |   0 |   0 |   0 |   0 |
+|     6 |   2 |   0 |   0 |   4 |   1 |   0 |
+|     8 |   0 |   4 |   3 |   6 |   0 |   1 |
+
+**Question 2 Answer:**
+
+_Show your table here._
+
+**Question 2 Code:**
+
+```{python}
+table = pd.crosstab(dat.cyl, dat.carb)
+table
+```
+
+<br>
+
+**Additional Questions:** On the Final Coding Challenge, I will also ask you to fit a Machine Learning Model. There may be 1-2 additional questions.
+
+```{python}
+import pandas as pd
+import altair as alt
+import numpy as np
+```
+```{python}
+dat = pd.read_csv('https://github.com/byuidatascience/data4missing/raw/master/data-raw/mtcars_missing/mtcars_missing.csv')
+dat
+
+####################
+##   Question 1   ##
+####################
+
+hp_mean = dat.hp.mean()
+hp_mean
+```
+```{python}
+dat2 = dat.copy()
+dat2.hp = dat2.hp.fillna(value = hp_mean)
+dat2
+
+```
+
+```{python}
+dat3 = dat2.dropna(subset=['car'])
+dat3
+
+```{python}
+q1_chart = (alt.Chart(dat3)
+            .mark_circle()
+            .encode(
+                x = alt.X('hp', axis = alt.Axis(title = "Horse Power", format="+.1f")),
+                y = alt.Y('mpg', axis = alt.Axis(title = "Miles per Gallon")),
+                color=alt.value("red"))
+            .properties(title = "This is awesome.")
+)
+q1_chart
+```
+```{python}
+lines_data = pd.DataFrame({"x":[80, 160]})
+print(lines_data)
+
+vert_lines = alt.Chart(lines_data).mark_rule().encode(x = 'x')
+vert_lines
+```
+```{python}
+text_data = pd.DataFrame({"x":[70, 145], "y":[25,20], "bob":["Big","Really Big"]})
+print(text_data)
+
+text_chart = alt.Chart(text_data).mark_text().encode(x='x',y='y',text='bob')
+text_chart
+```
+```{python}
+my_chart = q1_chart + vert_lines + text_chart
+my_chart.configure_title(anchor='start')
+```
+```{python}
+####################
+##   Question 2   ##
+####################
+
+# With the original data
+pd.crosstab(dat.cyl, dat.carb)
+
+print(pd.crosstab(dat.cyl, dat.carb).to_markdown())
+```
+
+```{python}
+# With the cleaned data from Q1
+print(pd.crosstab(dat3.cyl, dat3.carb).to_markdown())
+```
+```{python}
+# Another method using pivot_table (with original data)
+dat.value_counts(subset = ['cyl','carb'])
+```
+```{python}
+dat4 = (dat
+  .value_counts(subset = ['cyl','carb'])
+  .reset_index()
+  .rename(columns = {0:"bob"})
+  )
+dat4
+```
+```{python}
+dat4.pivot_table(
+    values = 'bob',
+    index = 'cyl',
+    columns = 'carb',
+    fill_value=0
+    )
+```
+```{python}
+# And another method (with original data)
+q2 = dat.filter(["carb","cyl"])
+q2[["ones"]] = 1
+
+q2.pivot_table(values = "ones", 
+               index = "cyl", 
+               columns = "carb",
+               fill_value = 0,
+               aggfunc='sum')
+```

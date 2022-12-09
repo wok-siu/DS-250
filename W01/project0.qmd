@@ -1,0 +1,60 @@
+---
+title: "Client Report - [Project 0]"
+subtitle: "Course DS 250"
+author: "Duane Siu"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+    
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+import altair as alt
+
+url = "https://github.com/byuidatascience/data4python4ds/raw/master/data-raw/mpg/mpg.csv"
+mpg = pd.read_csv(url)
+```
+# Chart 1:
+
+```{python}
+chart = (alt.Chart(mpg)
+  .encode(
+    x='displ', 
+    y='hwy')
+  .mark_circle()
+)
+chart
+```
+
+```{python}
+print(mpg
+  .head(5)
+  .filter(["manufacturer", "model","year", "hwy"])
+  .to_markdown(index=False))
+```
+
+| manufacturer   | model   |   year |   hwy |
+|:---------------|:--------|-------:|------:|
+| audi           | a4      |   1999 |    29 |
+| audi           | a4      |   1999 |    29 |
+| audi           | a4      |   2008 |    31 |
+| audi           | a4      |   2008 |    30 |
+| audi           | a4      |   1999 |    26 |
+
